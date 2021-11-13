@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Shopping.Client.Data;
+using Newtonsoft.Json;
+
 using Shopping.Client.Models;
 using System;
 using System.Collections.Generic;
@@ -22,9 +23,13 @@ namespace Shopping.Client.Controllers
             _httpclient = httpClientFactory.CreateClient("ShoppingAPIClient");
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View(ProductContext.Products);
+
+            var response = await _httpclient.GetAsync("/product");
+            var content = await response.Content.ReadAsStringAsync();
+            var productList = JsonConvert.DeserializeObject<IEnumerable<Product>>(content);
+            return View(productList);
         }
 
         public IActionResult Privacy()
